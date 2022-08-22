@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import Feather from "react-native-vector-icons/Feather";
-// import useOrientation from "../hooks/useOrientation";
 import { setStatusBarNetworkActivityIndicatorVisible, StatusBar } from "expo-status-bar";
 // import { captureScreen } from "react-native-view-shot";
 // import * as MediaLibrary from "expo-media-library";
@@ -24,52 +23,38 @@ import * as THREE from "three";
 import matchAll from "string.prototype.matchall";
 
 import Axios from "axios";
-import Colors from "../components/CPK_Colors.json";
-import { getConnect, mapAtoms } from "../components/PdbParse_Connect";
+import Colors from "../utils/cpkColorsDetails.json";
+import { mapAtoms } from "../utils/mapAtoms"
+import { getConnect } from "../utils/getConnect"
 import parsePdb from "parse-pdb";
 import OrbitControlsView from "expo-three-orbit-controls";
-// Feather.loadFont();
-
 import Footer from '../components/footer'
 
-const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
-	console.log('colorsLight', colorsLight)
-	const colorScheme = useColorScheme();
-	// const orientation = useOrientation();
+const LigandScreen = ({ route, colorsLight, setColorsLight, jmolRasmol }) => {
 	const RefScreen = useRef(null);
-	const [modul, setModulisation] = useState(1);
-
 	const [connects, setConnects] = useState([]);
-	const [mount, setMounted] = useState(true);
+	const [loading, setLoading] = useState(true);
+  const ConnectRegex = /^CONECT(:?\s*\d+.+)+/gm
 	const [Atoms, setAtoms] = useState([]);
-	const [keyRender, setKeyrender] = useState(false);
-	const [jmol, setJmol] = useState(true);
-
 	const { item } = route.params
-  console.log("item", item)
-	const url1 = `https://files.rcsb.org/ligands/view/${item}_model.pdb`;
 	const [width, setWidth] = useState(Dimensions.get("screen").width);
 	const [height, setHeight] = useState(Dimensions.get("screen").height);
-
 	const [aspectRatio, setCameraRatio] = useState(
 		width < height ? width / height : height / width
 	);
 	const renderRef = useRef(null);
-
-
-
+  
 	useEffect(() => {
-		Axios(url1)
+		Axios(`https://files.rcsb.org/ligands/view/${item}_model.pdb`)
 			.then((res) => {
 				if (res.data) {
-					let array = [...matchAll(res.data, /^CONECT(:?\s*\d+.+)+/gm)];
+					let array = [...matchAll(res.data, ConnectRegex)];
 					let atomsPdb = parsePdb(res.data);
 					let newAtoms = mapAtoms(atomsPdb.atoms);
 					setAtoms(newAtoms);
-
 					array = array.filter((el, key) => key < atomsPdb.atoms?.length);
 					setConnects(getConnect(array));
-					setMounted(false);
+					setLoading(false);
 				}
 			})
 			.catch((er) => alert(er));
@@ -113,7 +98,6 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 		},
 		buttons_group_item: {
 			marginHorizontal: 10,
-			// fontFamily: "Bold",
 			fontSize: 20,
 			color: "#343434",
 		},
@@ -124,9 +108,6 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 		content: {
 			backgroundColor: "#F4F1DE",
 			flex: 1,
-			// position: "absolute",
-			// top: 0,
-			// left: 0,
 			zIndex: 1,
 		},
 		
@@ -138,146 +119,76 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 		},
 	});
 
-	const styles_landscape = StyleSheet.create({
-		go_back: {
-			position: "absolute",
-			top: 20,
-			left: 20,
-			zIndex: 1,
-		},
-	});
-	
-	const change_color = () => {
-		setJmol(!jmol);
-		setKeyrender(!keyRender);
-	};
-
-
 	useEffect(() => {
-		const subscription = Dimensions.addEventListener("change", () => {
+		const dimensions = Dimensions.addEventListener("change", () => {
 			setWidth(Dimensions.get("screen").width);
 			setHeight(Dimensions.get("screen").height);
 			setCameraRatio(
 				Dimensions.get("screen").width / Dimensions.get("screen").height
 			);
-			console.log("Camera", camera.position.z);
-			setKeyrender(!keyRender);
 		});
-		return () => subscription?.remove();
+		return () => dimensions?.remove();
 	}, [width, height]);
 
-
-
-	const geo = new THREE.SphereGeometry();
-	const geo2 = new THREE.BoxGeometry();
 	const scene = new THREE.Scene();
-	// const camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000); 
   const camera = new THREE.PerspectiveCamera(90, aspectRatio, 0.01, 1000);
 	const raycaster = new THREE.Raycaster();
-	function capitalizeFirstLetter(string) {
-		return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-	}
-	const handleStateChange = ({ nativeEvent }) => {
-		let mouse = new THREE.Vector2();
-		mouse.x = (nativeEvent.pageX / width) * 2 - 1;
-		mouse.y = -(nativeEvent.pageY / height) * 2 + 1;
-		raycaster.setFromCamera(mouse, camera);
-		// calculate objects intersecting the picking ray
-		const intersects = raycaster.intersectObjects(scene.children);
-		if (intersects[0]?.object?.AtomsInfos) {
-			let elemnt = capitalizeFirstLetter(
-				intersects[0].object.AtomsInfos.element
-			);
-			console.log(elemnt);
-			Alert.alert(
-				"Atom Details",
-				`Element : ${elemnt}
-				Discovered by: ${Colors[elemnt]?.discoverd_by}
-				Phase: ${Colors[elemnt]?.phase}`,
-				[
-					{
-						text: "Cancel",
-						onPress: () => console.log("Cancel Pressed"),
-						style: "cancel",
-					},
-					{ text: "OK", onPress: () => console.log("OK Pressed") },
-				],
-				{ cancelable: false }
-			);
-		}
-	};
-  const [glSnapShot, setGlSnapShot] = React.useState(null);
 
-	// const snapshot = async () => {
-	// 	try {
-	// 		let uri = await captureScreen({
-	// 			format: "jpg",
-	// 			quality: 0.8,
-	// 		});
-	// 		await Sharing.shareAsync(uri, { dialogTitle: "Share this image" });
-	// 		let result = await MediaLibrary.requestPermissionsAsync(true);
-	// 		if (result.status === "granted") {
-	// 			let r = await MediaLibrary.saveToLibraryAsync(uri);
-	// 			console.log(r);
-	// 		}
-	// 	} catch (e) {
-	// 		console.log(e);
-	// 	}
-	// };
+  const showAtomsInfo = ({ nativeEvent }) => {
+    let pointer = new THREE.Vector2();
+    pointer.x = (nativeEvent.locationX / width) * 2 - 1;
+    pointer.y = -(nativeEvent.locationY / height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    // calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects(scene.children);
+    if (intersects.length > 0) {
+      let element = intersects[0].object;
+      if (element.AtomsInfos != undefined) {
+        
+        Alert.alert(
+          "Atom Details",
+          `
+          Name: ${Colors[intersects[0].object.AtomsInfos.element]?.name}
+          Element: ${intersects[0].object.AtomsInfos.element}
+          Appearance: ${Colors[intersects[0].object.AtomsInfos.element]?.appearance}
+          Category: ${Colors[intersects[0].object.AtomsInfos.element]?.category}
+          Discovered by: ${Colors[intersects[0].object.AtomsInfos.element]?.discovered_by}
+          Named by: ${Colors[intersects[0].object.AtomsInfos.element]?.named_by}
+          Phase: ${Colors[intersects[0].object.AtomsInfos.element]?.phase}
+          Number: ${Colors[intersects[0].object.AtomsInfos.element]?.number}
+          Summary: ${Colors[intersects[0].object.AtomsInfos.element]?.summary}
+          `,
+          [
+            {
+              text: "Cancel",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
+            },
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ],
+          { cancelable: false }
+        );
+      }
+    }
+  };
 
 	return (
 		<View style={styles.background}>
-			{/* <SafeAreaView style={{ flex: 1 }}> */}
-				{/* <StatusBar style={colorScheme === "dark" ? "light" : "dark"} /> */}
-				{/* {orientation === "portrait" ? ( */}
-					{/* <View style={styles.header}>
-						<TouchableOpacity
-							style={styles.button}
-							onPress={() => {
-								navigation.goBack();
-							}}
-						>
-							<Feather
-								name="chevron-left"
-								size={24}
-								color={"#E5E5E5"}
-							/>
-						</TouchableOpacity>
-						<View style={styles.qalb}></View>
-					</View> */}
-				{/* ) : null} */}
 				<View style={styles.content}>
-					{/* {orientation === "portrait" ? null : ( */}
-						{/* <TouchableOpacity
-							style={[styles.button, styles_landscape.go_back]}
-							onPress={() => {
-								navigation.goBack();
-							}}
-						>
-							<Feather
-								name="chevron-left"
-								size={24}
-								color={"#343434"}
-							/>
-						</TouchableOpacity> */}
-					{/* )} */}
-					{/* <ActivityIndicator style={styles.spinner} color="white" /> */}
-					{/* Drawing Protein */}
-					{mount ? (
+					{loading ? (
 						<ActivityIndicator color="#3D405B" size="large" style={{
               width: "100%", height: "100%", alignItems:"center", justifyContent: 'center'
             }}/>
 					) : (
 						<>
 							<OrbitControlsView
-								key={keyRender}
 								style={{ flex: 1 }}
 								camera={camera}
-								onTouchEndCapture={handleStateChange}
+								onTouchEndCapture={showAtomsInfo}
+                key={renderRef.current}
 							>
 								<GLView
 									ref={RefScreen}
-									key={keyRender}
 									style={{ flex: 1 }}
 									onContextCreate={async (gl) => {
 										
@@ -295,7 +206,6 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 										renderer.setSize(width, height);
 
 										camera.position.set(0, 0, 50);
-                    const scene = new THREE.Scene();
 
                     // scene.fog = new Fog(sceneColor, 1, 10000);
 										// camera.lookAt(scene.position);
@@ -306,20 +216,18 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 
 										// ambientLight.position.copy(camera.position);
 										scene.add(ambientLight);
-										/********** Use PDB PARSER */
-										/********** render ligand *************/
-
+										// render ligand 
 
 										const position = new THREE.Vector3();
 										for (let i = 0; i < Atoms?.length; i++) {
-											let colorCpk = !jmol
+											let cpk_color = jmolRasmol
 												? Colors[Atoms[i].element].jmol
 												: Colors[Atoms[i].element].rasmol;
 											
 											position.x = Atoms[i].x;
 											position.y = Atoms[i].y;
 											position.z = Atoms[i].z;
-											let color = new THREE.Color("#" + colorCpk);
+											let color = new THREE.Color("#" + cpk_color);
 
 											const material = new THREE.MeshPhongMaterial({
 												color: color,
@@ -354,34 +262,24 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 														end.y = Atoms[connects[j][i] - 1].y;
 														end.z = Atoms[connects[j][i] - 1].z;
 
-														start.multiplyScalar(
-															width > height
-																? width / height + 1
-																: height / width + 1
-														);
-														end.multiplyScalar(
-															width > height
-																? width / height + 1
-																: height / width + 1
-														);
-														const geoBox = new THREE.BoxGeometry(
-															0.5,
-															0.5,
+														start.multiplyScalar(height / width + 1);
+														end.multiplyScalar(height / width + 1);
+														const boxGeometry = new THREE.BoxGeometry(
+															0.6,
+															0.6,
 															start.distanceTo(end)
 														);
-														const cylinder = new THREE.Mesh(
-															geoBox,
+														const object = new THREE.Mesh(
+															boxGeometry,
 															new THREE.MeshPhongMaterial({ color: 0xffffff })
 														);
-														cylinder.position.copy(start);
-														cylinder.position.lerp(end, 0.5);
-														cylinder.lookAt(end);
-														scene.add(cylinder);
+														object.position.copy(start);
+														object.position.lerp(end, 0.5);
+														object.lookAt(end);
+														scene.add(object);
 													}
 												}
 											}
-
-										// setGlSnapShot(gl)
 
 										const render = () => {
 											requestAnimationFrame(render);
@@ -401,7 +299,7 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 						</>
 					)}
 				</View>
-        <Footer camera={camera} renderRef={renderRef} glSnapShot={glSnapShot} colorsLight={colorsLight} setColorsLight={setColorsLight}/>
+        <Footer camera={camera} renderRef={renderRef} colorsLight={colorsLight} setColorsLight={setColorsLight}/>
 		</View>
 	);
 };

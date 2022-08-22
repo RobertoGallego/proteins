@@ -1,14 +1,5 @@
-const regex = /^CONECT(:?\s*\d+.+)+/gm;
-const regexMatchdigit = /(:?\d+s*)/gm;
-const getConnect = (grp) => {
-  let array = [];
-  for (let i = 0; i < grp.length; i++) {
-    array.push(grp[i][1]?.match(regexMatchdigit));
-  }
-  return array;
-};
-const mapAtoms = (Atoms) => {
-  // console.log(Atoms.length);
+export const mapAtoms = (Atoms) => {
+  console.log(Atoms.length);
   let max = { x: Atoms[0]?.x, y: Atoms[0]?.y, z: Atoms[0]?.z };
   let min = { x: Atoms[0]?.x, y: Atoms[0]?.y, z: Atoms[0]?.z };
   for (let i = 0; i < Atoms.length; i++) {
@@ -27,4 +18,3 @@ const mapAtoms = (Atoms) => {
   }
   return Atoms;
 };
-module.exports = { getConnect, mapAtoms };

@@ -16,7 +16,7 @@ export default function App() {
   
   const [translateApp, setTranslateApp] = useState(false)
   const [colorsLight, setColorsLight] = useState(false)
-  
+  const [jmolRasmol, setJmolRasmol] = useState(false)
 
   LogBox.ignoreAllLogs() 
 
@@ -25,10 +25,10 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="SignInScreen"
             options={{orientation: 'false'}} 
-            screenOptions={{ headerShown: true, orientation: "all",  }}
+            screenOptions={{ headerShown: true, orientation: "portrait",  }}
         >
-          {/* ACTIVAR AL FINAL
-          <Stack.Screen name="Signin" options={() => ({
+          {/* ACTIVAR AL FINAL */}
+          {/* <Stack.Screen name="Signin" options={() => ({
             // title: translateApp ? 'Proteinas' : 'Proteins',
             headerStyle: {
               backgroundColor: colorsLight ? '#F4F1DE' : '#81B29A',
@@ -40,30 +40,30 @@ export default function App() {
           })}>
               {(props) => <SignInScreen {...props} />}
           </Stack.Screen> */}
-          <Stack.Screen name={translateApp ? "Home" : "Accueil"} options={{
+          <Stack.Screen name={"Home"} options={{
             // title: translateApp ? 'Contacto' : 'Contact',
             headerStyle: {
-              backgroundColor: colorsLight ? '#F4F1DE' : '#81B29A',
+              backgroundColor: colorsLight ? '#81B29A' : "#3D405B",
             },
-            headerTintColor: colorsLight ? '#81B29A' : '#fff',
+            headerTintColor: '#fff',
             headerTitleStyle: {
               fontWeight: 'normal',
             },
             headerBackVisible: false
           }}>
-            {(props) => <HomeScreen {...props} colorsLight={colorsLight} setColorsLight={setColorsLight}/>}
+            {(props) => <HomeScreen {...props} colorsLight={colorsLight} translateApp={translateApp} setTranslateApp={setTranslateApp} setColorsLight={setColorsLight} jmolRasmol={jmolRasmol} setJmolRasmol={setJmolRasmol}/>}
           </Stack.Screen>
           <Stack.Screen name="Protein" options={{
             // title: translateApp ? 'Mi Contacto' : 'My contact',
             headerStyle: {
-              backgroundColor: colorsLight ? '#F4F1DE' : '#81B29A',
+              backgroundColor: colorsLight ? '#81B29A' : "#3D405B",
             },
-            headerTintColor: colorsLight ? '#81B29A' : '#fff',
+            headerTintColor: '#fff',
             headerTitleStyle: {
               fontWeight: 'normal',
             },
           }}>
-            {(props) => <LigandScreen {...props} colorsLight={colorsLight} setColorsLight={setColorsLight}/>}
+            {(props) => <LigandScreen {...props} colorsLight={colorsLight} setColorsLight={setColorsLight} jmolRasmol={jmolRasmol} setJmolRasmol={setJmolRasmol}/>}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>

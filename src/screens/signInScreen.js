@@ -14,7 +14,7 @@ const SignInScreen =  ({navigation}) => {
       const worked = await LocalAuthentication.authenticateAsync();
       if (worked){
         navigation.navigate('Home');
-      alert("you're logged in");
+      // alert("you're logged in");
     }
     } catch (error) {
       alert("warning authentication failed");
