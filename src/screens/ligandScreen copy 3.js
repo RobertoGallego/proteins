@@ -32,8 +32,7 @@ import OrbitControlsView from "expo-three-orbit-controls";
 
 import Footer from '../components/footer'
 
-const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
-	console.log('colorsLight', colorsLight)
+const LigandScreen = ({ navigation, route }) => {
 	const colorScheme = useColorScheme();
 	// const orientation = useOrientation();
 	const RefScreen = useRef(null);
@@ -165,9 +164,6 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 		});
 		return () => subscription?.remove();
 	}, [width, height]);
-
-
-
 	const geo = new THREE.SphereGeometry();
 	const geo2 = new THREE.BoxGeometry();
 	const scene = new THREE.Scene();
@@ -276,132 +272,130 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 								onTouchEndCapture={handleStateChange}
 							>
 								<GLView
-									ref={RefScreen}
-									key={keyRender}
-									style={{ flex: 1 }}
-									onContextCreate={async (gl) => {
-										
-										
-										// GL Parameter disruption
-										const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
-                    gl.canvas = { width: gl.drawingBufferWidth, height: gl.drawingBufferHeight };
-										
-                    const sceneColor = "#F4F1DE";
-                    // Create a WebGLRenderer without a DOM element
-										// Renderer declaration and set properties
-										const renderer = new Renderer({ gl });
-										renderRef.current = renderer;
-										renderer.setClearColor(sceneColor);
-										renderer.setSize(width, height);
+                    style={{ flex: 1 }}
+                    onContextCreate={async (gl) => {
+                        // GL Parameter disruption
+                        const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
 
-										camera.position.set(0, 0, 50);
-                    const scene = new THREE.Scene();
+                        // Renderer declaration and set properties
+                        const renderer = new Renderer({ gl });
+                        renderer.setSize(width, height);
+                        renderer.setClearColor("#000");
 
-                    // scene.fog = new Fog(sceneColor, 1, 10000);
-										// camera.lookAt(scene.position);
-										scene.add(camera)
-                    // camera.lookAt(0, -15, 0);
+                        // Scene declaration, add a fog, and a grid helper to see axes dimensions
+                        const scene = new Scene();
 
-										const ambientLight = new THREE.PointLight(0xffffff, 1);
+                        //const interaction = new Interaction(renderer, scene, camera);
 
-										// ambientLight.position.copy(camera.position);
-										scene.add(ambientLight);
-										/********** Use PDB PARSER */
-										/********** render ligand *************/
+                        scene.add(camera);
+
+                        // light
+                        var light = new THREE.PointLight(0xffffff, 1);
+                        camera.add(light);
+
+                        /********** render ligand *************/
 
 
-										const position = new THREE.Vector3();
-										for (let i = 0; i < Atoms?.length; i++) {
-											let colorCpk = !jmol
-												? Colors[Atoms[i].element].jmol
-												: Colors[Atoms[i].element].rasmol;
-											
-											position.x = Atoms[i].x;
-											position.y = Atoms[i].y;
-											position.z = Atoms[i].z;
-											let color = new THREE.Color("#" + colorCpk);
+                        scene.add(root);
+                        var offset = new Vector3();
 
-											const material = new THREE.MeshPhongMaterial({
-												color: color,
-											});
+                        const geometryAtoms = pdb.geometryAtoms;
+                        const geometryBonds = pdb.geometryBonds;
+                        const json = pdb.json;
 
-											let object = new THREE.Mesh(
-												new THREE.SphereGeometry(),
-												material
-											);
+                        const boxGeometry = new BoxGeometry(1, 1, 1);
+                        const sphereGeometry = new SphereGeometry();
 
-											object.position.copy(position);
+                        geometryAtoms.computeBoundingBox();
+                        geometryAtoms.boundingBox.getCenter(offset).negate();
 
-											// position circle
-											object.position.multiplyScalar(height / width + 1);
-											// circle scale
-											object.scale.multiplyScalar(width / height + 0.2);
+                        geometryAtoms.translate(offset.x, offset.y, offset.z);
+                        geometryBonds.translate(offset.x, offset.y, offset.z);
 
-											object.AtomsInfos = Atoms[i];
-											scene.add(object);
-										}
+                        let positions = geometryAtoms.getAttribute('position');
+                        const colors = geometryAtoms.getAttribute('color');
 
-										const start = new THREE.Vector3();
-										const end = new THREE.Vector3();
+                        const position = new Vector3();
+                        const color = new Color();
 
-											for (let j = 0; j < connects.length; j++) {
-												for (let i = 1; i < connects[j].length; i++) {
-													if (connects[j][i] - 1 < Atoms.length) {
-														start.x = Atoms[connects[j][0] - 1].x;
-														start.y = Atoms[connects[j][0] - 1].y;
-														start.z = Atoms[connects[j][0] - 1].z;
-														end.x = Atoms[connects[j][i] - 1].x;
-														end.y = Atoms[connects[j][i] - 1].y;
-														end.z = Atoms[connects[j][i] - 1].z;
+                        for (let i = 0; i < positions.count; i++) {
 
-														start.multiplyScalar(
-															width > height
-																? width / height + 1
-																: height / width + 1
-														);
-														end.multiplyScalar(
-															width > height
-																? width / height + 1
-																: height / width + 1
-														);
-														const geoBox = new THREE.BoxGeometry(
-															0.5,
-															0.5,
-															start.distanceTo(end)
-														);
-														const cylinder = new THREE.Mesh(
-															geoBox,
-															new THREE.MeshPhongMaterial({ color: 0xffffff })
-														);
-														cylinder.position.copy(start);
-														cylinder.position.lerp(end, 0.5);
-														cylinder.lookAt(end);
-														scene.add(cylinder);
-													}
-												}
-											}
+                            const atom = json.atoms[i];
 
-										// setGlSnapShot(gl)
+                            position.x = positions.getX(i);
+                            position.y = positions.getY(i);
+                            position.z = positions.getZ(i);
 
-										const render = () => {
-											requestAnimationFrame(render);
-											ambientLight.position.set(
-												camera.position.x,
-												camera.position.y,
-												camera.position.z
-											);
-											renderer.render(scene, camera);
-											gl.endFrameEXP();
-										};
-										render(); 
-									}}
-									
-								/>
+                            color.r = colors.getX(i);
+                            color.g = colors.getY(i);
+                            color.b = colors.getZ(i);
+
+                            const material = new MeshPhongMaterial({ color: color });
+
+                            const object = new Mesh(sphereGeometry, material);
+                            object.position.copy(position);
+                            object.position.multiplyScalar(75);
+                            object.scale.multiplyScalar(25);
+
+                            root.add(object);
+
+                            const text = document.createElement('div');
+                            text.className = 'label';
+                            text.style.color = 'rgb(' + atom[3][0] + ',' + atom[3][1] + ',' + atom[3][2] + ')';
+                            text.textContent = atom[4];
+                        }
+
+                        positions = geometryBonds.getAttribute('position');
+
+                        const start = new Vector3();
+                        const end = new Vector3();
+
+                        for (let i = 0; i < positions.count; i += 2) {
+
+                            start.x = positions.getX(i);
+                            start.y = positions.getY(i);
+                            start.z = positions.getZ(i);
+
+                            end.x = positions.getX(i + 1);
+                            end.y = positions.getY(i + 1);
+                            end.z = positions.getZ(i + 1);
+
+                            start.multiplyScalar(75);
+                            end.multiplyScalar(75);
+
+                            const object = new Mesh(boxGeometry, new MeshPhongMaterial(0xffffff));
+                            object.position.copy(start);
+                            object.position.lerp(end, 0.5);
+                            object.scale.set(5, 5, start.distanceTo(end));
+                            object.lookAt(end);
+                            root.add(object);
+
+                        }
+                        scene.add(root);
+
+                        {/* scene.traverse(function (object) {
+                        object.frustumCulled = false;
+                    }); */}
+
+                        //**********
+
+                        // Render function
+                        const render = () => {
+                            timeout = requestAnimationFrame(render);
+                            renderer.render(scene, camera);
+                            // ref.current.getControls()?.update();
+                            gl.endFrameEXP();
+                        };
+                        render();
+                        setGlView(gl);
+                    }}
+                >
+                </GLView>
 							</OrbitControlsView>
 						</>
 					)}
 				</View>
-        <Footer camera={camera} renderRef={renderRef} glSnapShot={glSnapShot} colorsLight={colorsLight} setColorsLight={setColorsLight}/>
+        <Footer camera={camera} scene={scene} renderRef={renderRef} glSnapShot={glSnapShot}/>
 		</View>
 	);
 };

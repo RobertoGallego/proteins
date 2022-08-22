@@ -32,8 +32,7 @@ import OrbitControlsView from "expo-three-orbit-controls";
 
 import Footer from '../components/footer'
 
-const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
-	console.log('colorsLight', colorsLight)
+const LigandScreen = ({ navigation, route }) => {
 	const colorScheme = useColorScheme();
 	// const orientation = useOrientation();
 	const RefScreen = useRef(null);
@@ -165,9 +164,6 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 		});
 		return () => subscription?.remove();
 	}, [width, height]);
-
-
-
 	const geo = new THREE.SphereGeometry();
 	const geo2 = new THREE.BoxGeometry();
 	const scene = new THREE.Scene();
@@ -282,68 +278,68 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 									onContextCreate={async (gl) => {
 										
 										
-										// GL Parameter disruption
+
 										const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
                     gl.canvas = { width: gl.drawingBufferWidth, height: gl.drawingBufferHeight };
 										
                     const sceneColor = "#F4F1DE";
                     // Create a WebGLRenderer without a DOM element
-										// Renderer declaration and set properties
 										const renderer = new Renderer({ gl });
 										renderRef.current = renderer;
 										renderer.setClearColor(sceneColor);
 										renderer.setSize(width, height);
 
 										camera.position.set(0, 0, 50);
-                    const scene = new THREE.Scene();
+                    // const scene = new THREE.Scene();
 
                     // scene.fog = new Fog(sceneColor, 1, 10000);
-										// camera.lookAt(scene.position);
-										scene.add(camera)
+										camera.lookAt(scene.position);
                     // camera.lookAt(0, -15, 0);
 
-										const ambientLight = new THREE.PointLight(0xffffff, 1);
-
-										// ambientLight.position.copy(camera.position);
+										const ambientLight = new THREE.DirectionalLight(
+											0xffffff,
+											0.9
+										);
+										ambientLight.position.copy(camera.position);
 										scene.add(ambientLight);
 										/********** Use PDB PARSER */
-										/********** render ligand *************/
-
-
 										const position = new THREE.Vector3();
 										for (let i = 0; i < Atoms?.length; i++) {
-											let colorCpk = !jmol
-												? Colors[Atoms[i].element].jmol
-												: Colors[Atoms[i].element].rasmol;
-											
+											/**
+											 * Make the first letter of the element uppercase amd the rest lowercase
+											 */
+											const element =
+												Atoms[i].element.charAt(0).toUpperCase() +
+												Atoms[i].element.slice(1).toLowerCase();
+											let colorCpk = jmol
+												? Colors[element].jmol
+												: Colors[element].rasmol;
 											position.x = Atoms[i].x;
 											position.y = Atoms[i].y;
 											position.z = Atoms[i].z;
 											let color = new THREE.Color("#" + colorCpk);
-
-											const material = new THREE.MeshPhongMaterial({
+											const mtrl = new THREE.MeshPhongMaterial({
 												color: color,
+												shininess: 50,
 											});
 
 											let object = new THREE.Mesh(
-												new THREE.SphereGeometry(),
-												material
+												// modul === 3 ? geo2 : geo,
+												geo,
+												mtrl
+											);
+
+											position.multiplyScalar(
+												width > height ? width / height + 1 : height / width + 1
 											);
 
 											object.position.copy(position);
-
-											// position circle
-											object.position.multiplyScalar(height / width + 1);
-											// circle scale
-											object.scale.multiplyScalar(width / height + 0.2);
-
 											object.AtomsInfos = Atoms[i];
 											scene.add(object);
 										}
-
 										const start = new THREE.Vector3();
 										const end = new THREE.Vector3();
-
+										// if (modul !== 2) {
 											for (let j = 0; j < connects.length; j++) {
 												for (let i = 1; i < connects[j].length; i++) {
 													if (connects[j][i] - 1 < Atoms.length) {
@@ -380,7 +376,7 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 													}
 												}
 											}
-
+										// }
 										// setGlSnapShot(gl)
 
 										const render = () => {
@@ -401,7 +397,7 @@ const LigandScreen = ({ navigation, route, colorsLight, setColorsLight }) => {
 						</>
 					)}
 				</View>
-        <Footer camera={camera} renderRef={renderRef} glSnapShot={glSnapShot} colorsLight={colorsLight} setColorsLight={setColorsLight}/>
+        <Footer camera={camera} scene={scene} renderRef={renderRef} glSnapShot={glSnapShot}/>
 		</View>
 	);
 };

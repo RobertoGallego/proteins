@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect, useMemo} from 'react'
-import { TextInput, StyleSheet, Text, View, AppState, ScrollView, TouchableOpacity, FlatList } from 'react-native'
+import { Pressable, TextInput, StyleSheet, Text, View, AppState, ScrollView, TouchableOpacity, FlatList } from 'react-native'
 import { FontAwesome } from '@expo/vector-icons' 
 import { Entypo } from '@expo/vector-icons' 
 
 import { ligands } from '../utils/ligands'
 import LigandsList from '../components/ligandsList'
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, colorsLight, setColorsLight }) => {
+  console.log(colorsLight)
   const appState = useRef(AppState.currentState)
 
   useEffect(() => {
@@ -76,17 +77,30 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* <ScrollView keyboardShouldPersistTaps="true"> */}
-      <View style={styles.searchBarContainer}>
-        <FontAwesome name="search" size={24} color="#3D405B" />
-        <TextInput
-          style={styles.searchBar}
-          value={search}
-          placeholder="Protein search"
-          placeholderTextColor={'#3D405B'}
-          underlineColorAndroid="transparent"
-          onChangeText={searchFilter}
-        />
-        <Entypo name="circle-with-cross" size={24} color={search.length > 0 ? "#3D405B" : "#F4F1DE" } onPress={() => setsearch("")}/>
+      <View style={{ flexDirection: 'row', marginHorizontal: 10 }}>
+        <View style={styles.searchBarContainer}>
+          <FontAwesome name="search" size={24} color="#3D405B" />
+          <TextInput
+            style={styles.searchBar}
+            value={search}
+            placeholder="Protein search"
+            placeholderTextColor={'#3D405B'}
+            underlineColorAndroid="transparent"
+            onChangeText={searchFilter}
+          />
+          <Entypo name="circle-with-cross" size={24} color={search.length > 0 ? "#3D405B" : "#F4F1DE" } onPress={() => setsearch("")}/>
+        </View>
+        <Pressable
+              style={styles.darkModeButton}
+              // style={{ alignItems: 'center', flex: 1, backgroundColor: "#81B29A" }}
+              onPress={() => setColorsLight(!colorsLight)}
+            >
+              <Text style={styles.darkMode}>
+                 Dark
+              </Text> 
+              {/* {Jmol ? JmolCOlor : JemolColor} */}
+              {/* <Entypo name="language" size={24} color={"white"} /> */}
+          </Pressable>
       </View>
       <FlatList 
         data={filtredData}
@@ -150,11 +164,35 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     marginTop: 20,
     marginBottom: 5,
-    width: '90%'
+    width: '80%',
+    marginRight: 10
+
   },
   searchBar: {
     flex: 1,
     textAlign: 'center',
+  },
+  darkModeButton: {
+    flex: 1,
+    alignSelf: 'center',
+    textAlign: 'center',
+    alignItems: 'center',
+    alignItems: 'center', flex: 1, backgroundColor: "#81B29A"
+  },
+  darkMode: {
+    // flex: 1,
+    alignItems: 'center', flex: 1, backgroundColor: "#81B29A",
+    alignSelf: 'center',
+    textAlign: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    borderColor: '#3D405B',
+    borderWidth: 2,
+    borderRadius: 10,
+    // paddingHorizontal: 10,
+    // paddingVertical: 5,
+    // marginTop: 20,
+    // marginBottom: 5,
   }
 })
 

@@ -14,8 +14,8 @@ import { captureScreen } from "react-native-view-shot";
 
 import { Fontisto } from '@expo/vector-icons'
 
-const Footer = ({ scene, camera, renderRef, glSnapShot }) => {
-
+const Footer = ({ camera, renderRef, glSnapShot, colorsLight, setColorsLight }) => {
+  const scene = new THREE.Scene();
   const handleZoomLingands = zoomDirection => {
     console.log(camera.fov)
     if (camera.fov >= 60 && zoomDirection) camera.fov -= 5
@@ -48,26 +48,37 @@ const Footer = ({ scene, camera, renderRef, glSnapShot }) => {
   return (
     <View style={styles.footer}>
           <Pressable
-              style={{ alignItems: 'center', flex: 1, backgroundColor: "#81B29A", paddingVertical: 14, borderWidth: 5,
+              style={{ alignItems: 'center', flex: 1, backgroundColor: "#81B29A", paddingVertical: 14, marginHorizontal: 10,
               borderRadius: 100,  }}
               onPress={() => handleZoomLingands(true)}
             > 
               <Fontisto name="zoom-plus" size={24} color="white" />
           </Pressable>
           <Pressable
-              style={{ alignItems: 'center', flex: 1, backgroundColor: "#90bda7", paddingVertical: 14, borderWidth: 5,
+              style={{ alignItems: 'center', flex: 1, backgroundColor: "#90bda7", paddingVertical: 14, marginHorizontal: 10,
               borderRadius: 100,}}
               onPress={() => handleZoomLingands(false)}
             >
               <Fontisto name="zoom-minus" size={24} color="white" />
           </Pressable>
           <Pressable
-              style={{ alignItems: 'center', flex: 1, backgroundColor: "#81B29A", paddingVertical: 14, borderWidth: 5,
+              style={{ alignItems: 'center', flex: 1, backgroundColor: "#81B29A", paddingVertical: 14, marginHorizontal: 10,
               borderRadius: 100, }}
               onPress={shareScreen}
             >
               {/* <Entypo name="language" size={24} color={"white"} /> */}
               <Text style={{ color: "#fff" }}>{'EN'}</Text>
+          </Pressable>
+          <Pressable
+              style={{ alignItems: 'center', flex: 1, backgroundColor: "#81B29A", paddingVertical: 14, marginHorizontal: 10,
+              borderRadius: 100, }}
+              onPress={() => {}}
+            >
+              <Text style={{ color: "#fff" }}>
+                 Jmol
+              </Text> 
+              {/* {Jmol ? JmolCOlor : JemolColor} */}
+              {/* <Entypo name="language" size={24} color={"white"} /> */}
           </Pressable>
 
         </View>

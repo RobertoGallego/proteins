@@ -13,9 +13,11 @@ console.disableYellowBox = true
 
 export default function App() {
   const Stack = createNativeStackNavigator()
+  
   const [translateApp, setTranslateApp] = useState(false)
   const [colorsLight, setColorsLight] = useState(false)
   
+
   LogBox.ignoreAllLogs() 
 
   return (
@@ -38,7 +40,7 @@ export default function App() {
           })}>
               {(props) => <SignInScreen {...props} />}
           </Stack.Screen> */}
-          <Stack.Screen name="Home" options={{
+          <Stack.Screen name={translateApp ? "Home" : "Accueil"} options={{
             // title: translateApp ? 'Contacto' : 'Contact',
             headerStyle: {
               backgroundColor: colorsLight ? '#F4F1DE' : '#81B29A',
@@ -49,7 +51,7 @@ export default function App() {
             },
             headerBackVisible: false
           }}>
-            {(props) => <HomeScreen {...props} />}
+            {(props) => <HomeScreen {...props} colorsLight={colorsLight} setColorsLight={setColorsLight}/>}
           </Stack.Screen>
           <Stack.Screen name="Protein" options={{
             // title: translateApp ? 'Mi Contacto' : 'My contact',
@@ -61,7 +63,7 @@ export default function App() {
               fontWeight: 'normal',
             },
           }}>
-            {(props) => <LigandScreen {...props} />}
+            {(props) => <LigandScreen {...props} colorsLight={colorsLight} setColorsLight={setColorsLight}/>}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
