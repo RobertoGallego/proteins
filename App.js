@@ -38,7 +38,7 @@ export default function App() {
             },
             headerTintColor: colorsLight ? '#81B29A' : '#fff',
           })}>
-              {(props) => <SignInScreen {...props} />}
+              {(props) => <SignInScreen {...props} colorsLight={colorsLight} />}
           </Stack.Screen>
           <Stack.Screen name={"Home"} options={{
             title: translateApp ? 'Home' : 'Inicio',
