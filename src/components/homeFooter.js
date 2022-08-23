@@ -18,7 +18,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { Entypo } from '@expo/vector-icons'; 
 import { Ionicons } from '@expo/vector-icons'; 
-import { cpk_coloryng } from '../utils/cpkColorings'
+import { cpk_coloryng, cpk_coloryng_es } from '../utils/cpkColorings'
 
 
 const HomeFooter = ({ colorsLight, setColorsLight, jmolRasmol, setJmolRasmol, translateApp, setTranslateApp }) => {
@@ -32,7 +32,7 @@ const HomeFooter = ({ colorsLight, setColorsLight, jmolRasmol, setJmolRasmol, tr
     setColorPress(4)
     Alert.alert(
       "CPK coloring",
-      `${cpk_coloryng}`,
+      `${!translateApp ? cpk_coloryng_es : cpk_coloryng}`,
       [
         {
           text: "Cancel",
