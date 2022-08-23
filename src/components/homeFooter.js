@@ -59,13 +59,13 @@ const HomeFooter = ({ colorsLight, setColorsLight, jmolRasmol, setJmolRasmol, tr
           style={{ alignItems: 'center', flex: 1 }}
           onPress={() => setColorsLight(!colorsLight)}
         >
-          <MaterialCommunityIcons name="theme-light-dark" size={24} color={!colorsLight ? "#F2CC8F" : "white"} />
+          <MaterialCommunityIcons name="theme-light-dark" size={24} color={colorsLight ? "white":"#F2CC8F"} />
       </Pressable>
       <Pressable
           style={{ alignItems: 'center', flex: 1 }}
           onPress={() => setTranslateApp(!translateApp)}
         >
-          <Entypo name="language" size={24} color={!translateApp ? "#F2CC8F" : "white"} />
+          <Entypo name="language" size={24} color={translateApp ? "white":"#F2CC8F"} />
       </Pressable>
       <Pressable
           style={{ alignItems: 'center', flex: 1 }}

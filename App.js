@@ -14,8 +14,8 @@ console.disableYellowBox = true
 export default function App() {
   const Stack = createNativeStackNavigator()
   
-  const [translateApp, setTranslateApp] = useState(false)
-  const [colorsLight, setColorsLight] = useState(false)
+  const [translateApp, setTranslateApp] = useState(true)
+  const [colorsLight, setColorsLight] = useState(true)
   const [jmolRasmol, setJmolRasmol] = useState(false)
 
   LogBox.ignoreAllLogs() 
@@ -31,12 +31,12 @@ export default function App() {
           <Stack.Screen name="Signin" options={() => ({
             // title: translateApp ? 'Proteinas' : 'Proteins',
             headerStyle: {
-              backgroundColor: colorsLight ? '#F4F1DE' : '#81B29A',
+              backgroundColor: colorsLight ? '#81B29A' : "#3D405B",
             },
             headerTitleStyle: {
               fontWeight: 'normal',
             },
-            headerTintColor: colorsLight ? '#81B29A' : '#fff',
+            headerTintColor: '#fff',
           })}>
               {(props) => <SignInScreen {...props} colorsLight={colorsLight} />}
           </Stack.Screen>

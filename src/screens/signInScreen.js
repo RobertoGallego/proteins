@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { FontAwesome5 } from '@expo/vector-icons'; 
 
-const SignInScreen =  ({navigation}) => {
+const SignInScreen =  ({navigation, colorsLight}) => {
   const [deviceHardwareState, setDeviceHardwareState] = useState(false)
 
   const onTouchID = async () => {
@@ -41,7 +41,7 @@ const SignInScreen =  ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Pressable style={{ color: '#000', fontSize: 18, backgroundColor: '#81B29A', alignItems: 'center',
+      <Pressable style={{ color: '#000', fontSize: 18, backgroundColor: colorsLight ? '#81B29A' : "#3D405B", alignItems: 'center',
         borderRadius: 100, padding: 20
       }} onPress={onTouchID} >
         <FontAwesome5 name="fingerprint" size={24} color="white" />
