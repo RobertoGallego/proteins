@@ -1,19 +1,11 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
-  Pressable,
 	ActivityIndicator,
 	StyleSheet,
-	Text,
-	TouchableOpacity,
-	useColorScheme,
 	View,
-	StatusBar as RNStatusBar,
 	Alert,
 	Dimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-// import Feather from "react-native-vector-icons/Feather";
-import { setStatusBarNetworkActivityIndicatorVisible, StatusBar } from "expo-status-bar";
 // import { captureScreen } from "react-native-view-shot";
 // import * as MediaLibrary from "expo-media-library";
 // import * as Sharing from "expo-sharing";
@@ -207,14 +199,10 @@ const LigandScreen = ({ route, colorsLight, setColorsLight, jmolRasmol }) => {
 
 										camera.position.set(0, 0, 50);
 
-                    // scene.fog = new Fog(sceneColor, 1, 10000);
-										// camera.lookAt(scene.position);
 										scene.add(camera)
-                    // camera.lookAt(0, -15, 0);
 
 										const ambientLight = new THREE.PointLight(0xffffff, 1);
 
-										// ambientLight.position.copy(camera.position);
 										scene.add(ambientLight);
 										// render ligand 
 
@@ -258,6 +246,7 @@ const LigandScreen = ({ route, colorsLight, setColorsLight, jmolRasmol }) => {
 														start.x = Atoms[connects[j][0] - 1].x;
 														start.y = Atoms[connects[j][0] - 1].y;
 														start.z = Atoms[connects[j][0] - 1].z;
+
 														end.x = Atoms[connects[j][i] - 1].x;
 														end.y = Atoms[connects[j][i] - 1].y;
 														end.z = Atoms[connects[j][i] - 1].z;

@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar'
 
-import { StyleSheet, View, LogBox } from 'react-native'
+import { StyleSheet, View, LogBox, Text } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
@@ -28,7 +28,7 @@ export default function App() {
             screenOptions={{ headerShown: true, orientation: "portrait",  }}
         >
           {/* ACTIVAR AL FINAL */}
-          {/* <Stack.Screen name="Signin" options={() => ({
+          <Stack.Screen name="Signin" options={() => ({
             // title: translateApp ? 'Proteinas' : 'Proteins',
             headerStyle: {
               backgroundColor: colorsLight ? '#F4F1DE' : '#81B29A',
@@ -39,9 +39,12 @@ export default function App() {
             headerTintColor: colorsLight ? '#81B29A' : '#fff',
           })}>
               {(props) => <SignInScreen {...props} />}
-          </Stack.Screen> */}
+          </Stack.Screen>
           <Stack.Screen name={"Home"} options={{
-            // title: translateApp ? 'Contacto' : 'Contact',
+            title: translateApp ? 'Home' : 'Inicio',
+            headerRight: () => (
+              <Text style={{ color: '#fff', fontSize: 18 }}>{ jmolRasmol ? 'Jmol' : 'Rasmol'}</Text>
+            ),
             headerStyle: {
               backgroundColor: colorsLight ? '#81B29A' : "#3D405B",
             },
@@ -54,7 +57,7 @@ export default function App() {
             {(props) => <HomeScreen {...props} colorsLight={colorsLight} translateApp={translateApp} setTranslateApp={setTranslateApp} setColorsLight={setColorsLight} jmolRasmol={jmolRasmol} setJmolRasmol={setJmolRasmol}/>}
           </Stack.Screen>
           <Stack.Screen name="Protein" options={{
-            // title: translateApp ? 'Mi Contacto' : 'My contact',
+            title: translateApp ? 'Protein' : 'Proteinas',
             headerStyle: {
               backgroundColor: colorsLight ? '#81B29A' : "#3D405B",
             },
